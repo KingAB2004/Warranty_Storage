@@ -159,7 +159,74 @@ const Contact =asyncWrapper(async(req ,res)=>{
     });
     res.status(201).json({task});
 });
-// 
-// 
-// 
-module.exports={addingnewuser,fetchingdetails,addingnewmerchantuser,uploadwarranty,getWarranty ,Contact}
+
+
+
+
+
+const fetchvalidations = async (req, res) => {
+    try {
+        const { store_name, store_location } = req.body;
+
+        // Validate required parameters
+        if (!store_name || !store_location) {
+            return res.status(400).json({
+                success: false,
+                message: "Store name and store location are required.",
+            });
+        }
+
+        // Fetch the warranties based on store_name and store_location
+        const output = await UserWarranty.find({ store_name, store_location });
+
+        // If no warranties found, return a message
+        if (output.length === 0) {
+            return res.status(200).json({
+                success: true,
+                msg: "No warranties for your store right now."
+            });
+        }
+
+        // Optional: Process the output (e.g., add the invoice URL or file metadata)
+        const responseData = output.map((warranty) => {
+            return {
+                ...warranty.toObject(), // Convert Mongoose document to plain object
+                invoiceUrl: warranty.invoice ? `/download/invoice/${warranty._id}` : null, // Add a link to download the invoice
+            };
+        });
+
+        // Send the processed data back to the client
+        res.status(200).json({
+            success: true,
+            data: responseData, // Respond with the modified output that includes invoice download URL
+        });
+
+    } catch (error) {
+        // Handle any errors during the process
+        console.error("Error fetching validations:", error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+        });
+    }
+};
+const updatewarrantystatus = async (req, res) => {
+    try {
+        const { id } = req.params;  
+        const { status } = req.body; 
+        const updatedWarranty = await UserWarranty.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true } 
+        );
+        res.status(200).json({success:true,updatedWarranty});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating warranty status',
+            error: error.message,
+        });
+    }
+};
+module.exports={addingnewuser,fetchingdetails,addingnewmerchantuser,uploadwarranty,getWarranty ,Contact,updatewarrantystatus,fetchvalidations}

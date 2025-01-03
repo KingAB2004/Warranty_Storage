@@ -11,6 +11,7 @@ import RegisterMerchant from './merchant-register';
 import ContactUs from './contactus';
 import FAQs from './Faqs';
 import WarrantyList from "./warranty-edit";
+import MerchantValidation from "./MerchantValidation";
 function App() {
   return (
     <Router>
@@ -23,7 +24,7 @@ function App() {
       <Route path="/ContactUs" element={<ContactUs/>}></Route>
       <Route path="/FAQs" element={<FAQs/>}></Route>
       <Route path="/UserEdit" element={<WarrantyList/>}></Route>
-
+      <Route path="/Currentwarrantylist" element={<MerchantValidation/>}></Route>
     </Routes>
   </Router>
   )
